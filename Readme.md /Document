@@ -1,0 +1,39 @@
+# Add the "HtmlAgilityPack" as a NuGet package to your solution
+ 
+# Need a using statement - "using HtmlAgilityPack;"
+ 
+using (var httpClient = new HttpClient())
+ 
+{
+ 
+var formattedUrl = "https://www.nuget.org/packages/Microsoft.AspNet.WebApi/5.2.6";
+ 
+var webResponse = await httpClient.GetStringAsync(formattedUrl);
+ 
+var htmlDoc = new HtmlDocument();
+ 
+htmlDoc.LoadHtml(webResponse);
+ 
+// XPath expression - this one does the following:
+ 
+// Finds the "body" html element from the root
+ 
+// Finds a "div" element under body element that has the 'id' attribute of 'skippedToContent'
+ 
+// Finds a section element under that div element that has the 'role' attribute set to 'main'
+ 
+// Finds the first div element (1-based index instead of 0-based) under that section element
+ 
+// Finds an "aside" element under that div thas has the "aria-label" attribute set to 'Package details info'
+ 
+// Finds an "a" elements under any ul/li element where the "a" element has a "data-track" attribute set to "outbound-license-url"
+ 
+var licenseLink = htmlDoc.DocumentNode.SelectSingleNode("//body/div[@id='skippedToContent']/section[@role='main']/div[1]/aside[@aria-label='Package details info']/ul/li/a[@data-track='outbound-license-url']");
+ 
+var licenseType = licenseLink.InnerHtml.Replace("\r", String.Empty).Replace("\n", String.Empty).Trim();
+ 
+var licenseUrl = licenseLink.Attributes["href"].Value;
+ 
+}
+ 
+ 
